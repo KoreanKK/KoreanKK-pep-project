@@ -27,4 +27,13 @@ public class MessageService {
         return messageDAO.createMessageDAO(message); //
     }
 
+    public List<Message> retrieveAllMessage () {
+        return messageDAO.RetrieveAllMessagesDAO();
+    }
+
+    public List<Message> retrieveAllMessageByMessageID (int messageID) {
+        return messageDAO.RetrieveAllMessagesByMessageIDDAO(messageID);
+    }
+    
+
 }

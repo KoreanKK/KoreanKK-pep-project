@@ -20,7 +20,7 @@ public class AccountDAO {
             preparedStatement.executeUpdate();
             ResultSet rs = preparedStatement.getGeneratedKeys();
             if (rs.next()) {
-                int generated_account_id = rs.getInt(1);
+                int generated_account_id = (int)rs.getLong(1);
                 return new Account(generated_account_id, account.getUsername(), account.getPassword());
             }
         } catch(SQLException e) {
@@ -41,7 +41,8 @@ public class AccountDAO {
             if (rs.next()) {
                 //int generated_account_id = rs.getInt(1);
                 if (rs.getString("username").equals(account.getUsername()) && rs.getString("password").equals(account.getPassword())) {
-                    return account;
+                    int generated_account_id = (int)rs.getLong(1);
+                    return new Account(generated_account_id, account.getUsername(), account.getPassword());
                 }
             }
         } catch(SQLException e) {

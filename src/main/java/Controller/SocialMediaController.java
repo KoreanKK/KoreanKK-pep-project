@@ -6,6 +6,8 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import Model.Account;
 import Model.Message;
+import java.sql.*;
+import java.util.*;
 
 import Service.AccountService;
 import Service.MessageService;
@@ -23,42 +25,48 @@ public class SocialMediaController {
      */
     AccountService accountService;
     MessageService messageService;
+    public SocialMediaController() {
+        accountService = new AccountService();
+        messageService = new MessageService();
+    }
 
     public Javalin startAPI() {
         /* Post to update server, get to gain information from the server */
         Javalin app = Javalin.create();
         ObjectMapper om = new ObjectMapper();
 
-
-
         app.post("/register", this::registerHandler); //1: user registration
-        app.post("/login", this::loginHandler);
-        app.post("/messages", this::createMessageHandler);
-        
+        app.post("/login", this::loginHandler); //2: user login
+        app.post("/messages", this::createMessageHandler); //3: create message
+        app.get("/messages", this::retrieveAllMessageHandler); //4: retrieve all messages
+        app.get("/messages/{message_id}", this::retrieveAllMessageByMessageIDHandler); //5: retrieve message by message_id
+
         return app;
     }
-
 
     private void registerHandler(Context context) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         Account account = om.readValue(context.body(), Account.class);
-        if (accountService.register(account) == null) {
+        Account newAccount = accountService.register(account);
+        if (newAccount == null) {
             //response status to 400?
             context.status(400);
         } else {
-            context.json(account);
+            context.json(newAccount);
         }
     }
 
     private void loginHandler(Context context) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         Account account = om.readValue(context.body(), Account.class);
-        if (accountService.login(account) == null) {
+        Account newAccount = accountService.login(account);
+        if (newAccount == null) {
             //response status to 401?
+            //System.out.println("TRIGGERED HERE ");
             context.status(401);
             //HTTP status?
         } else {
-            context.json(account);
+            context.json(newAccount);
         }
     }
 
@@ -66,13 +74,36 @@ public class SocialMediaController {
     private void createMessageHandler(Context context) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         Message message = om.readValue(context.body(), Message.class);
-        if (messageService.createMessage(message) == null) {
+        Message newMessage = messageService.createMessage(message);
+        if (newMessage == null) {
             //response status to 400
             context.status(400);
         } else {
-            context.json(message);
+            context.json(newMessage);
         }
     }
+
+    private void retrieveAllMessageHandler(Context context) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+
+        List<Message> newMessage = messageService.retrieveAllMessage();
+
+        context.json(om.writeValueAsString(newMessage));
+    }
+
+    private void retrieveAllMessageByMessageIDHandler(Context context) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+
+        String messageId = context.pathParam("message_id");
+        int a = Integer.parseInt(messageId);
+        List<Message> newMessage = messageService.retrieveAllMessageByMessageID(a);
+
+        context.json(om.writeValueAsString(newMessage));
+        
+    }
+
+    
+    
 
     /**
      * This is an example handler for an example endpoint.
