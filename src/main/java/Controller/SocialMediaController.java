@@ -40,6 +40,7 @@ public class SocialMediaController {
         app.post("/messages", this::createMessageHandler); //3: create message
         app.get("/messages", this::retrieveAllMessageHandler); //4: retrieve all messages
         app.get("/messages/{message_id}", this::retrieveAllMessageByMessageIDHandler); //5: retrieve message by message_id
+        app.delete("/messages/{message_id}", this::deleteMessageHandler); //6: delete Message by ID
 
         return app;
     }
@@ -96,14 +97,26 @@ public class SocialMediaController {
 
         String messageId = context.pathParam("message_id");
         int a = Integer.parseInt(messageId);
-        List<Message> newMessage = messageService.retrieveAllMessageByMessageID(a);
-
-        context.json(om.writeValueAsString(newMessage));
+        Message newMessage = messageService.retrieveAllMessageByMessageID(a);
+        if (newMessage == null) {
+            context.status(200);
+        } else {
+            context.json(om.writeValueAsString(newMessage));
+        }
         
     }
 
-    
-    
+    private void deleteMessageHandler(Context context) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        String messageId = context.pathParam("message_id");
+        int a = Integer.parseInt(messageId);
+        Message deletedMessage = messageService.deleteMessage(a);
+        if (deletedMessage == null) {
+            context.status(200);
+        } else {
+            context.json(om.writeValueAsString(deletedMessage));
+        }
+    }
 
     /**
      * This is an example handler for an example endpoint.

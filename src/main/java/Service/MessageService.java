@@ -31,8 +31,12 @@ public class MessageService {
         return messageDAO.RetrieveAllMessagesDAO();
     }
 
-    public List<Message> retrieveAllMessageByMessageID (int messageID) {
+    public Message retrieveAllMessageByMessageID (int messageID) {
         return messageDAO.RetrieveAllMessagesByMessageIDDAO(messageID);
+    }
+
+    public Message deleteMessage(int messageID) {
+        return messageDAO.deleteMessageDAO(messageID);
     }
     
 
