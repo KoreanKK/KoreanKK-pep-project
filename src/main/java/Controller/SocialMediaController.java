@@ -41,6 +41,8 @@ public class SocialMediaController {
         app.get("/messages", this::retrieveAllMessageHandler); //4: retrieve all messages
         app.get("/messages/{message_id}", this::retrieveAllMessageByMessageIDHandler); //5: retrieve message by message_id
         app.delete("/messages/{message_id}", this::deleteMessageHandler); //6: delete Message by ID
+        app.patch("/messages/{message_id}", this::updateMessageHandler); //7: update message by messageID
+        app.get("/accounts/{account_id}/messages", this::retrieveAllMessageByAccountIDHandler);//8: retrieve messages by account_id
 
         return app;
     }
@@ -116,6 +118,35 @@ public class SocialMediaController {
         } else {
             context.json(om.writeValueAsString(deletedMessage));
         }
+    }
+
+    private void updateMessageHandler(Context context) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        //String messageIDString = context.pathParam("message_id");
+        String messageText = om.readValue(context.body(), Message.class).getMessage_text();
+        Message newMessage = messageService.updateMessage(Integer.valueOf(context.pathParam("message_id")), messageText);
+        /* 
+        Message message = om.readValue(context.body(), Message.class);
+        Message updatedMessage = messageService.updateMessage(message);
+        */
+
+
+        //how to grab posted_time_epoch? do i have to find it from 
+        if (newMessage == null) {
+            context.status(400);
+        } else {
+            context.status(200).json(om.writeValueAsString(newMessage));
+        }
+    }
+
+    private void retrieveAllMessageByAccountIDHandler(Context context) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        String accountIDString = context.pathParam("account_id");
+        int accountID = Integer.parseInt(accountIDString);
+        List<Message> newMessage = messageService.retrieveAllMessageByAccountID(accountID);
+
+        context.json(om.writeValueAsString(newMessage));
+        context.status(200);
     }
 
     /**

@@ -38,6 +38,26 @@ public class MessageService {
     public Message deleteMessage(int messageID) {
         return messageDAO.deleteMessageDAO(messageID);
     }
+
+    public Message updateMessage(int id, String text) {
+        /* 
+        int messageLength = text.length();
+        if (messageLength > 255 || messageLength == 0) {
+            return null;
+        }
+        */
+        Message message = messageDAO.RetrieveAllMessagesByMessageIDDAO(id);
+
+        if (message == null || text.isBlank() || text.length() > 255) {
+            return null;
+        }
+        message.setMessage_text(text);
+        return messageDAO.updateMessageDAO(message);
+    }
+
+    public List<Message> retrieveAllMessageByAccountID (int accountID) {
+        return messageDAO.RetrieveAllMessagesByAccountIDDAO(accountID);
+    }
     
 
 }
