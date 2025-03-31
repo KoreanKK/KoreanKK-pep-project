@@ -135,7 +135,7 @@ public class SocialMediaController {
         if (newMessage == null) {
             context.status(400);
         } else {
-            context.status(200).json(om.writeValueAsString(newMessage));
+            context.status(200).json(om.writeValueAsString(newMessage)); 
         }
     }
 
